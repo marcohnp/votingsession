@@ -1,9 +1,7 @@
 package com.marcohnp.votingsession.controller.v1;
 
 import com.marcohnp.votingsession.facade.VotoFacade;
-import com.marcohnp.votingsession.model.request.SessaoRequest;
 import com.marcohnp.votingsession.model.request.VotoRequest;
-import com.marcohnp.votingsession.model.response.SessaoResponse;
 import com.marcohnp.votingsession.model.response.VotoResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

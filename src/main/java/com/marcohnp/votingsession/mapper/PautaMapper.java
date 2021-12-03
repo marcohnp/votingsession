@@ -44,4 +44,6 @@ public class PautaMapper {
                 .sessao(SessaoMapper.modelToResponse(model.getSessao()))
                 .build();
     }
+
+
 }

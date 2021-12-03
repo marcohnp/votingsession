@@ -3,8 +3,10 @@ package com.marcohnp.votingsession.mapper;
 import com.marcohnp.votingsession.entity.VotoEntity;
 import com.marcohnp.votingsession.enums.VotoEnum;
 import com.marcohnp.votingsession.model.VotoModel;
+import com.marcohnp.votingsession.model.VotoResultadoModel;
 import com.marcohnp.votingsession.model.request.VotoRequest;
 import com.marcohnp.votingsession.model.response.VotoResponse;
+import com.marcohnp.votingsession.model.response.VotoResultadoResponse;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
@@ -67,5 +69,12 @@ public class VotoMapper {
     public static List<VotoEntity> listModelToListEntity(List<VotoModel> modelList) {
         if (ObjectUtils.isEmpty(modelList)) return null;
         return modelList.stream().map(VotoMapper::modelToEntity).collect(Collectors.toList());
+    }
+
+    public static VotoResultadoResponse modelResultadoToResponse(VotoResultadoModel model) {
+        return VotoResultadoResponse.builder()
+                .sim(model.getSim())
+                .nao(model.getNao())
+                .build();
     }
 }

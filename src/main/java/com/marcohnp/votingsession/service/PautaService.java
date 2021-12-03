@@ -9,23 +9,37 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @AllArgsConstructor
 public class PautaService {
 
-    private PautaRepository pautaRepository;
+    private PautaRepository repository;
 
     public PautaModel criarPautaEmSessao(PautaModel model) {
-        return PautaMapper.entityToModel(pautaRepository.save(PautaMapper.modelToEntity(model)));
+        return PautaMapper.entityToModel(repository.save(PautaMapper.modelToEntity(model)));
     }
 
     public void salvarSessaoEmPauta(SessaoModel sessao) {
-        var pauta = PautaMapper.entityToModel(pautaRepository.findById(sessao.getIdPauta()).orElseThrow(() -> {
-            log.error("Sessao com id {} não encontada.",sessao.getIdPauta());
+        var pauta = PautaMapper.entityToModel(repository.findById(sessao.getIdPauta()).orElseThrow(() -> {
+            log.error("Sessao com id {} não encontada.", sessao.getIdPauta());
             throw new PautaNotFoundException("Pauta não encontada");
         }));
         pauta.setSessao(sessao);
-        pautaRepository.save(PautaMapper.modelToEntity(pauta));
+        repository.save(PautaMapper.modelToEntity(pauta));
+    }
+
+    public List<PautaModel> listarPautas() {
+        return repository.findAll().stream().map(PautaMapper::entityToModel).collect(Collectors.toList());
+    }
+
+    public PautaModel recuperarPautaPorId(String id) {
+        return PautaMapper.entityToModel(repository.findById(id).orElseThrow(() -> {
+            log.error("Sessao com id {} não encontada.", id);
+            throw new PautaNotFoundException("Pauta não encontada");
+        }));
     }
 }

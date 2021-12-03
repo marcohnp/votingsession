@@ -2,8 +2,10 @@ package com.marcohnp.votingsession.mapper;
 
 import com.marcohnp.votingsession.entity.SessaoEntity;
 import com.marcohnp.votingsession.model.SessaoModel;
+import com.marcohnp.votingsession.model.SessaoResultadoModel;
 import com.marcohnp.votingsession.model.request.SessaoRequest;
 import com.marcohnp.votingsession.model.response.SessaoResponse;
+import com.marcohnp.votingsession.model.response.SessaoResultadoResponse;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
@@ -63,5 +65,27 @@ public class SessaoMapper {
                 .build();
     }
 
+    public static SessaoResultadoResponse resultadoModelToResponse(SessaoResultadoModel model) {
+        if (ObjectUtils.isEmpty(model)) return null;
+        return SessaoResultadoResponse.builder()
+                .id(model.getId())
+                .dataInicioSessao(model.getDataInicioSessao())
+                .dataEncerramentoSessao(model.getDataEncerramentoSessao())
+                .cpfsVotantes(model.getCpfsVotantes())
+                .resultadoVotacao(VotoMapper.modelResultadoToResponse(model.getResultadoVotacao()))
+                .idPauta(model.getIdPauta())
+                .build();
+    }
+
+    public static SessaoResultadoModel modelToResultadoModel(SessaoModel model) {
+        if (ObjectUtils.isEmpty(model)) return null;
+        return SessaoResultadoModel.builder()
+                .id(model.getId())
+                .dataInicioSessao(model.getDataInicioSessao())
+                .dataEncerramentoSessao(model.getDataEncerramentoSessao())
+                .cpfsVotantes(model.getCpfsVotantes())
+                .idPauta(model.getIdPauta())
+                .build();
+    }
 
 }

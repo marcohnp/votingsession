@@ -1,14 +1,11 @@
 package com.marcohnp.votingsession.model.request;
 
-import com.marcohnp.votingsession.enums.VotoEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 
 @Builder
 @Data

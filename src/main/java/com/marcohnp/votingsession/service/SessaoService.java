@@ -1,11 +1,15 @@
 package com.marcohnp.votingsession.service;
 
+import com.marcohnp.votingsession.entity.SessaoEntity;
+import com.marcohnp.votingsession.enums.VotoEnum;
 import com.marcohnp.votingsession.exception.exceptions.CpfNaoHabilitadoParaVotarException;
 import com.marcohnp.votingsession.exception.exceptions.SessaoEncerradaException;
 import com.marcohnp.votingsession.exception.exceptions.SessaoNotFoundException;
 import com.marcohnp.votingsession.mapper.SessaoMapper;
 import com.marcohnp.votingsession.model.SessaoModel;
+import com.marcohnp.votingsession.model.SessaoResultadoModel;
 import com.marcohnp.votingsession.model.VotoModel;
+import com.marcohnp.votingsession.model.VotoResultadoModel;
 import com.marcohnp.votingsession.repository.SessaoRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,11 +48,33 @@ public class SessaoService {
                 log.error("Sessão com id {} não encontrada", sessaoModel.getId());
                 throw new SessaoNotFoundException("Sessao não encontada");
             });
+            encerrarSessao(sessaoAtualizada);
+        }, sessaoModel.getDuracao(), TimeUnit.MINUTES);
+    }
+
+    private void encerrarSessao(SessaoEntity sessaoAtualizada) {
+        if (sessaoAtualizada.getSessaoAberta()) {
             sessaoAtualizada.setSessaoAberta(Boolean.FALSE);
             sessaoAtualizada.setDataEncerramentoSessao(LocalDateTime.now());
-            log.info("Sessão id {} encerrada.", sessaoAtualizada.getId());
             repository.save(sessaoAtualizada);
-        }, sessaoModel.getDuracao(), TimeUnit.MINUTES);
+            pautaService.salvarSessaoEmPauta(SessaoMapper.entityToModel(sessaoAtualizada));
+            log.info("Sessão id {} encerrada.", sessaoAtualizada.getId());
+        } else {
+            log.info("Sessão id {} foi encerrada manualmente", sessaoAtualizada.getId());
+        }
+    }
+
+    public String finalizarSessao(String id) {
+        var sessao = repository.findById(id).orElseThrow(() -> {
+            log.error("Sessão com id {} não encontrada", id);
+            throw new SessaoNotFoundException("Sessao não encontada");
+        });
+        sessao.setSessaoAberta(Boolean.FALSE);
+        sessao.setDataEncerramentoSessao(LocalDateTime.now());
+        repository.save(sessao);
+        pautaService.salvarSessaoEmPauta(SessaoMapper.entityToModel(sessao));
+        log.info("Sessão id {} encerrada.", id);
+        return "Sessão " + id + " encerrada.";
     }
 
     public SessaoModel recuperarSessaoPorId(String id) {
@@ -93,7 +119,7 @@ public class SessaoService {
 
     private void validarCpfVotante(VotoModel model, List<VotoModel> listaVotos) {
         listaVotos.forEach(votoModel -> {
-            if(votoModel.getCpf().equals(model.getCpf())) {
+            if (votoModel.getCpf().equals(model.getCpf())) {
                 log.error("CPF {} já votou na sessão informada.", model.getCpf());
                 throw new CpfNaoHabilitadoParaVotarException("CPF informado já votou nessa sessão.");
             }
@@ -110,5 +136,29 @@ public class SessaoService {
             novaListaCpf.add(model.getCpf());
             sessao.setCpfsVotantes(novaListaCpf);
         }
+    }
+
+    public SessaoResultadoModel recuperarResultadoSessao(String id) {
+        var sessao = SessaoMapper.entityToModel(repository.findById(id).orElseThrow(() -> {
+            log.error("Sessão com id {} não encontrada", id);
+            throw new SessaoNotFoundException("Sessao não encontada");
+        }));
+        log.info("Iniciado processo para recuperar resultado da Sessão id {}", id);
+        var resultadoSessao = SessaoMapper.modelToResultadoModel(sessao);
+        contarVotos(sessao, resultadoSessao);
+        return resultadoSessao;
+    }
+
+    private void contarVotos(SessaoModel sessao, SessaoResultadoModel resultadoSessao) {
+        var votosSim = (int) sessao.getVotos().stream()
+                .filter(votoModel -> votoModel.getVoto().equals(VotoEnum.SIM)).count();
+        var votosNao = (int) sessao.getVotos().stream()
+                .filter(votoModel -> votoModel.getVoto().equals(VotoEnum.NAO)).count();
+        resultadoSessao.setResultadoVotacao(
+                VotoResultadoModel.builder()
+                        .sim(votosSim)
+                        .nao(votosNao)
+                        .build());
+        log.info("Votos contados com sucesso. Sessão id {} : Sim({}), Não({})", resultadoSessao.getId(), votosSim, votosNao);
     }
 }

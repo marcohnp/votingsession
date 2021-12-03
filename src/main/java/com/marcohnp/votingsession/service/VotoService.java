@@ -7,10 +7,8 @@ import com.marcohnp.votingsession.model.VotoModel;
 import com.marcohnp.votingsession.repository.VotoRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Slf4j

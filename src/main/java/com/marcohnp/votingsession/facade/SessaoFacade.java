@@ -3,6 +3,7 @@ package com.marcohnp.votingsession.facade;
 import com.marcohnp.votingsession.mapper.SessaoMapper;
 import com.marcohnp.votingsession.model.request.SessaoRequest;
 import com.marcohnp.votingsession.model.response.SessaoResponse;
+import com.marcohnp.votingsession.model.response.SessaoResultadoResponse;
 import com.marcohnp.votingsession.service.SessaoService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,5 +20,13 @@ public class SessaoFacade {
 
     public SessaoResponse recuperarSessaoPorId(String id) {
         return SessaoMapper.modelToResponse(service.recuperarSessaoPorId(id));
+    }
+
+    public String finalizarSessao(String id) {
+        return service.finalizarSessao(id);
+    }
+
+    public SessaoResultadoResponse recuperarResultadoSessao(String id) {
+        return SessaoMapper.resultadoModelToResponse(service.recuperarResultadoSessao(id));
     }
 }
