@@ -23,7 +23,7 @@ public class SessaoFacade {
     }
 
     public String finalizarSessao(String id) {
-        return service.finalizarSessao(id);
+        return service.finalizarSessaoManualmente(id);
     }
 
     public SessaoResultadoResponse recuperarResultadoSessao(String id) {

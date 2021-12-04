@@ -1,6 +1,7 @@
 package com.marcohnp.votingsession.mapper;
 
 import com.marcohnp.votingsession.entity.SessaoEntity;
+import com.marcohnp.votingsession.kafka.model.SessaoKafkaModel;
 import com.marcohnp.votingsession.model.SessaoModel;
 import com.marcohnp.votingsession.model.SessaoResultadoModel;
 import com.marcohnp.votingsession.model.request.SessaoRequest;
@@ -84,6 +85,18 @@ public class SessaoMapper {
                 .dataInicioSessao(model.getDataInicioSessao())
                 .dataEncerramentoSessao(model.getDataEncerramentoSessao())
                 .cpfsVotantes(model.getCpfsVotantes())
+                .idPauta(model.getIdPauta())
+                .build();
+    }
+
+    public static SessaoKafkaModel resultadoModelToKafka(SessaoResultadoModel model) {
+        if (ObjectUtils.isEmpty(model)) return null;
+        return SessaoKafkaModel.builder()
+                .id(model.getId())
+                .dataInicioSessao(model.getDataInicioSessao())
+                .dataEncerramentoSessao(model.getDataEncerramentoSessao())
+                .cpfsVotantes(model.getCpfsVotantes())
+                .resultadoVotacao(model.getResultadoVotacao())
                 .idPauta(model.getIdPauta())
                 .build();
     }

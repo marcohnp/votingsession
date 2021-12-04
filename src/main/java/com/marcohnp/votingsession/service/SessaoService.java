@@ -5,6 +5,7 @@ import com.marcohnp.votingsession.enums.VotoEnum;
 import com.marcohnp.votingsession.exception.exceptions.CpfNaoHabilitadoParaVotarException;
 import com.marcohnp.votingsession.exception.exceptions.SessaoEncerradaException;
 import com.marcohnp.votingsession.exception.exceptions.SessaoNotFoundException;
+import com.marcohnp.votingsession.kafka.producer.SessaoKafkaProducer;
 import com.marcohnp.votingsession.mapper.SessaoMapper;
 import com.marcohnp.votingsession.model.SessaoModel;
 import com.marcohnp.votingsession.model.SessaoResultadoModel;
@@ -30,6 +31,7 @@ public class SessaoService {
 
     private PautaService pautaService;
     private SessaoRepository repository;
+    private SessaoKafkaProducer sessaoKafkaProducer;
     private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 
     public SessaoModel criarSessaoParaPauta(SessaoModel model, String idPauta) {
@@ -59,12 +61,15 @@ public class SessaoService {
             repository.save(sessaoAtualizada);
             pautaService.salvarSessaoEmPauta(SessaoMapper.entityToModel(sessaoAtualizada));
             log.info("Sessão id {} encerrada.", sessaoAtualizada.getId());
+            var resultadoSessao =SessaoMapper.resultadoModelToKafka(recuperarResultadoSessao(sessaoAtualizada.getId()));
+            sessaoKafkaProducer.publish(resultadoSessao);
+            log.info("Resultado sessão id {} publicado no Kafka.", sessaoAtualizada.getId());
         } else {
             log.info("Sessão id {} foi encerrada manualmente", sessaoAtualizada.getId());
         }
     }
 
-    public String finalizarSessao(String id) {
+    public String finalizarSessaoManualmente(String id) {
         var sessao = repository.findById(id).orElseThrow(() -> {
             log.error("Sessão com id {} não encontrada", id);
             throw new SessaoNotFoundException("Sessao não encontada");
@@ -73,7 +78,10 @@ public class SessaoService {
         sessao.setDataEncerramentoSessao(LocalDateTime.now());
         repository.save(sessao);
         pautaService.salvarSessaoEmPauta(SessaoMapper.entityToModel(sessao));
+        var resultadoSessao =SessaoMapper.resultadoModelToKafka(recuperarResultadoSessao(id));
+        sessaoKafkaProducer.publish(resultadoSessao);
         log.info("Sessão id {} encerrada.", id);
+        log.info("Resultado sessão id {} publicado no Kafka.", id);
         return "Sessão " + id + " encerrada.";
     }
 
