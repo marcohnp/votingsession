@@ -11,8 +11,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 
-import java.time.LocalDateTime;
-
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SessaoMapper {
 
@@ -20,7 +18,6 @@ public class SessaoMapper {
         if (ObjectUtils.isEmpty(request)) return null;
         return SessaoModel.builder()
                 .duracao(request.getDuracao())
-                .dataInicioSessao(LocalDateTime.now())
                 .build();
     }
 

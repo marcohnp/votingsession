@@ -36,6 +36,7 @@ public class SessaoService {
 
     public SessaoModel criarSessaoParaPauta(SessaoModel model, String idPauta) {
         model.setIdPauta(idPauta);
+        model.setDataInicioSessao(LocalDateTime.now());
         model.setSessaoAberta(Boolean.TRUE);
         var sessao = SessaoMapper.entityToModel(repository.save(SessaoMapper.modelToEntity(model)));
         pautaService.salvarSessaoEmPauta(sessao);

@@ -19,7 +19,7 @@ public class PautaService {
 
     private PautaRepository repository;
 
-    public PautaModel criarPautaEmSessao(PautaModel model) {
+    public PautaModel criarPauta(PautaModel model) {
         return PautaMapper.entityToModel(repository.save(PautaMapper.modelToEntity(model)));
     }
 

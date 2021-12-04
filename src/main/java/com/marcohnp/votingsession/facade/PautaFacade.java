@@ -16,8 +16,8 @@ public class PautaFacade {
 
     private PautaService service;
 
-    public PautaResponse criarPautaEmSessao(PautaRequest request) {
-        return PautaMapper.modelToResponse(service.criarPautaEmSessao(PautaMapper.requestToModel(request)));
+    public PautaResponse criarPauta(PautaRequest request) {
+        return PautaMapper.modelToResponse(service.criarPauta(PautaMapper.requestToModel(request)));
     }
 
     public List<PautaResponse> listarPautas() {
