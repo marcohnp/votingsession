@@ -11,17 +11,25 @@ import com.marcohnp.votingsession.model.SessaoModel;
 import com.marcohnp.votingsession.model.SessaoResultadoModel;
 import com.marcohnp.votingsession.model.VotoModel;
 import com.marcohnp.votingsession.model.VotoResultadoModel;
+import com.marcohnp.votingsession.provider.DateTimeProvider;
 import com.marcohnp.votingsession.repository.SessaoRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static java.lang.Boolean.TRUE;
 
 @Slf4j
 @Service
@@ -31,13 +39,30 @@ public class SessaoService {
 
     private PautaService pautaService;
     private SessaoRepository repository;
+    private DateTimeProvider provider;
     private SessaoKafkaProducer sessaoKafkaProducer;
     private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 
+    @EventListener(ApplicationReadyEvent.class)
+    public void gerarScheduleSessoesAbertas() {
+        var sessoesAbertas = repository.findAll()
+                .stream()
+                .filter(sessao -> TRUE.equals(sessao.getSessaoAberta()))
+                .map(SessaoMapper::entityToModel)
+                .collect(Collectors.toList());
+
+        if (ObjectUtils.isNotEmpty(sessoesAbertas)) {
+            sessoesAbertas.forEach(sessao -> {
+                log.info("Sessao id {} continua aberta.", sessao.getId());
+                this.schedule(sessao);
+            });
+        }
+    }
+
     public SessaoModel criarSessaoParaPauta(SessaoModel model, String idPauta) {
         model.setIdPauta(idPauta);
-        model.setDataInicioSessao(LocalDateTime.now());
-        model.setSessaoAberta(Boolean.TRUE);
+        model.setDataInicioSessao(provider.now());
+        model.setSessaoAberta(TRUE);
         var sessao = SessaoMapper.entityToModel(repository.save(SessaoMapper.modelToEntity(model)));
         pautaService.salvarSessaoEmPauta(sessao);
         log.info("Sessão id {} aberta para votação.", sessao.getId());
@@ -46,23 +71,33 @@ public class SessaoService {
     }
 
     private void schedule(SessaoModel sessaoModel) {
-        executor.schedule(() -> {
+        LocalDateTime horarioAtual = provider.now();
+        LocalDateTime horarioFechamento = sessaoModel.getDataInicioSessao().plus(sessaoModel.getDuracao(), ChronoUnit.MINUTES);
+        if (horarioAtual.isBefore(horarioFechamento)) {
+            executor.schedule(() -> {
+                var sessaoAtualizada = repository.findById(sessaoModel.getId()).orElseThrow(() -> {
+                    log.error("Sessão com id {} não encontrada", sessaoModel.getId());
+                    throw new SessaoNotFoundException("Sessao não encontada");
+                });
+                encerrarSessao(sessaoAtualizada);
+            }, ChronoUnit.MINUTES.between(horarioAtual, horarioFechamento), TimeUnit.MINUTES);
+        } else {
             var sessaoAtualizada = repository.findById(sessaoModel.getId()).orElseThrow(() -> {
                 log.error("Sessão com id {} não encontrada", sessaoModel.getId());
                 throw new SessaoNotFoundException("Sessao não encontada");
             });
             encerrarSessao(sessaoAtualizada);
-        }, sessaoModel.getDuracao(), TimeUnit.MINUTES);
+        }
     }
 
     private void encerrarSessao(SessaoEntity sessaoAtualizada) {
         if (sessaoAtualizada.getSessaoAberta()) {
             sessaoAtualizada.setSessaoAberta(Boolean.FALSE);
-            sessaoAtualizada.setDataEncerramentoSessao(LocalDateTime.now());
+            sessaoAtualizada.setDataEncerramentoSessao(provider.now());
             repository.save(sessaoAtualizada);
             pautaService.salvarSessaoEmPauta(SessaoMapper.entityToModel(sessaoAtualizada));
             log.info("Sessão id {} encerrada.", sessaoAtualizada.getId());
-            var resultadoSessao =SessaoMapper.resultadoModelToKafka(recuperarResultadoSessao(sessaoAtualizada.getId()));
+            var resultadoSessao = SessaoMapper.resultadoModelToKafka(recuperarResultadoSessao(sessaoAtualizada.getId()));
             sessaoKafkaProducer.publish(resultadoSessao);
             log.info("Resultado sessão id {} publicado no Kafka.", sessaoAtualizada.getId());
         } else {
@@ -76,10 +111,10 @@ public class SessaoService {
             throw new SessaoNotFoundException("Sessao não encontada");
         });
         sessao.setSessaoAberta(Boolean.FALSE);
-        sessao.setDataEncerramentoSessao(LocalDateTime.now());
+        sessao.setDataEncerramentoSessao(provider.now());
         repository.save(sessao);
         pautaService.salvarSessaoEmPauta(SessaoMapper.entityToModel(sessao));
-        var resultadoSessao =SessaoMapper.resultadoModelToKafka(recuperarResultadoSessao(id));
+        var resultadoSessao = SessaoMapper.resultadoModelToKafka(recuperarResultadoSessao(id));
         sessaoKafkaProducer.publish(resultadoSessao);
         log.info("Sessão id {} encerrada.", id);
         log.info("Resultado sessão id {} publicado no Kafka.", id);

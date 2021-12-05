@@ -4,6 +4,7 @@ import com.marcohnp.votingsession.exception.exceptions.CpfNaoHabilitadoParaVotar
 import com.marcohnp.votingsession.integration.CpfValidatorIntegration;
 import com.marcohnp.votingsession.mapper.VotoMapper;
 import com.marcohnp.votingsession.model.VotoModel;
+import com.marcohnp.votingsession.provider.DateTimeProvider;
 import com.marcohnp.votingsession.repository.VotoRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ public class VotoService {
 
     private SessaoService sessaoService;
     private CpfValidatorIntegration integration;
+    private DateTimeProvider provider;
     private VotoRepository repository;
 
     public VotoModel enviarVotoParaSessao(VotoModel model, String idSessao) {
@@ -28,7 +30,7 @@ public class VotoService {
     }
 
     private VotoModel salvarVoto(VotoModel model, String idSessao) {
-        model.setDataVoto(LocalDateTime.now());
+        model.setDataVoto(provider.now());
         model.setIdSessao(idSessao);
         return VotoMapper.entityToModel(repository.save(VotoMapper.modelToEntity(model)));
     }

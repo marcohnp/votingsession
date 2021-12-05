@@ -24,7 +24,6 @@ public class PautaFacade {
         return service.listarPautas().stream().map(PautaMapper::modelToResponse).collect(Collectors.toList());
     }
 
-
     public PautaResponse recuperarPautaPorId(String id) {
         return PautaMapper.modelToResponse(service.recuperarPautaPorId(id));
     }

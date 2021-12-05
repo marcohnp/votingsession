@@ -14,8 +14,6 @@ import java.util.List;
 
 public class VotoStub {
 
-    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-
     public static VotoRequest createVotoRequestSimStub() {
         return VotoRequest.builder()
                 .cpf("22714037070")
@@ -34,7 +32,7 @@ public class VotoStub {
         return VotoModel.builder()
                 .cpf("22714037070")
                 .voto(VotoEnum.SIM)
-                .dataVoto(LocalDateTime.parse("01/05/2021 18:32:00", formatter))
+                .dataVoto(LocalDateTime.of(2021, 5, 1, 18,32, 0))
                 .idSessao("61abd13362ecab4fc1246cae")
                 .build();
     }
@@ -43,7 +41,7 @@ public class VotoStub {
         return VotoModel.builder()
                 .cpf("74568706084")
                 .voto(VotoEnum.NAO)
-                .dataVoto(LocalDateTime.parse("01/05/2021 18:33:00", formatter))
+                .dataVoto(LocalDateTime.of(2021, 5, 1, 18,33, 0))
                 .idSessao("61abd13362ecab4fc1246cae")
                 .build();
     }
@@ -56,7 +54,7 @@ public class VotoStub {
         return VotoResponse.builder()
                 .cpf("22714037070")
                 .voto(VotoEnum.SIM)
-                .dataVoto(LocalDateTime.parse("01/05/2021 18:32:00", formatter))
+                .dataVoto(LocalDateTime.of(2021, 5, 1, 18,32, 0))
                 .idSessao("61abd13362ecab4fc1246cae")
                 .build();
     }
@@ -65,7 +63,7 @@ public class VotoStub {
         return VotoResponse.builder()
                 .cpf("74568706084")
                 .voto(VotoEnum.NAO)
-                .dataVoto(LocalDateTime.parse("01/05/2021 18:33:00", formatter))
+                .dataVoto(LocalDateTime.of(2021, 5, 1, 18,33, 0))
                 .idSessao("61abd13362ecab4fc1246cae")
                 .build();
     }
@@ -78,7 +76,7 @@ public class VotoStub {
         return VotoEntity.builder()
                 .cpf("22714037070")
                 .voto(VotoEnum.SIM)
-                .dataVoto(LocalDateTime.parse("01/05/2021 18:32:00", formatter))
+                .dataVoto(LocalDateTime.of(2021, 5, 1, 18,32, 0))
                 .idSessao("61abd13362ecab4fc1246cae")
                 .build();
     }
@@ -87,7 +85,7 @@ public class VotoStub {
         return VotoEntity.builder()
                 .cpf("74568706084")
                 .voto(VotoEnum.NAO)
-                .dataVoto(LocalDateTime.parse("01/05/2021 18:33:00", formatter))
+                .dataVoto(LocalDateTime.of(2021, 5, 1, 18,33, 0))
                 .idSessao("61abd13362ecab4fc1246cae")
                 .build();
     }
