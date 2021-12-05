@@ -14,7 +14,7 @@ public class SessaoKafkaProducer {
     private final KafkaTemplate<String, SessaoKafkaModel> kafkaTemplate;
 
     public SessaoKafkaProducer(@Value("${kafka.topic}") String topic,
-                                KafkaTemplate<String, SessaoKafkaModel> kafkaTemplate) {
+                               KafkaTemplate<String, SessaoKafkaModel> kafkaTemplate) {
         this.topic = topic;
         this.kafkaTemplate = kafkaTemplate;
     }

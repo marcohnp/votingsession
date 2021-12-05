@@ -1,28 +1,21 @@
 package com.marcohnp.votingsession.service;
 
 import com.marcohnp.votingsession.exception.exceptions.CpfNaoHabilitadoParaVotarException;
-import com.marcohnp.votingsession.exception.exceptions.PautaNotFoundException;
 import com.marcohnp.votingsession.integration.CpfValidatorIntegration;
 import com.marcohnp.votingsession.integration.response.CpfValidatorResponse;
 import com.marcohnp.votingsession.provider.DateTimeProvider;
 import com.marcohnp.votingsession.repository.VotoRepository;
-import com.marcohnp.votingsession.stub.SessaoStub;
 import com.marcohnp.votingsession.stub.VotoStub;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -34,9 +27,6 @@ class VotoServiceTest {
 
     @Mock
     private VotoRepository repository;
-
-    @Mock
-    private SessaoService sessaoService;
 
     @Mock
     private CpfValidatorIntegration integration;
@@ -57,7 +47,7 @@ class VotoServiceTest {
         when(repository.save(any())).thenReturn(VotoStub.createVotoEntitySimStub());
         when(integration.validarCpf("22714037070")).thenReturn(cpfValidator);
 
-        assertEquals(votoModel, votoService.enviarVotoParaSessao(votoModel,"61abd13362ecab4fc1246cae"));
+        assertEquals(votoModel, votoService.enviarVotoParaSessao(votoModel, "61abd13362ecab4fc1246cae"));
         verify(repository, times(1)).save(any());
         verify(integration, times(1)).validarCpf("22714037070");
     }

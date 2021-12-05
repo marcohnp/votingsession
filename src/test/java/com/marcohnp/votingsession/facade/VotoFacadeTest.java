@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -25,7 +25,7 @@ class VotoFacadeTest {
     void enviarVotoParaSessao_deveEnviarModelEIdSessaoParaServiceERetornarResponse_QuandoRequestForValida() {
         when(service.enviarVotoParaSessao(any(), any())).thenReturn(VotoStub.createVotoModelSimStub());
         assertEquals(VotoStub.createVotoResponseSimStub(),
-                facade.enviarVotoParaSessao(VotoStub.createVotoRequestSimStub(),"61abd13362ecab4fc1246cae"));
+                facade.enviarVotoParaSessao(VotoStub.createVotoRequestSimStub(), "61abd13362ecab4fc1246cae"));
         verify(service, times(1)).enviarVotoParaSessao(any(), any());
     }
 

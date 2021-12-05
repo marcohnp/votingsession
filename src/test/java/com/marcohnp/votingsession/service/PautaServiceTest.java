@@ -1,15 +1,11 @@
 package com.marcohnp.votingsession.service;
 
 import com.marcohnp.votingsession.exception.exceptions.PautaNotFoundException;
-import com.marcohnp.votingsession.model.PautaModel;
-import com.marcohnp.votingsession.model.SessaoModel;
 import com.marcohnp.votingsession.repository.PautaRepository;
 import com.marcohnp.votingsession.stub.PautaStub;
 import com.marcohnp.votingsession.stub.SessaoStub;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;

@@ -4,7 +4,7 @@ import com.marcohnp.votingsession.model.SessaoModel;
 import com.marcohnp.votingsession.stub.SessaoStub;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SessaoMapperTest {
 
