@@ -29,6 +29,9 @@ class VotoServiceTest {
     private VotoRepository repository;
 
     @Mock
+    private SessaoService sessaoService;
+
+    @Mock
     private CpfValidatorIntegration integration;
 
     @Mock

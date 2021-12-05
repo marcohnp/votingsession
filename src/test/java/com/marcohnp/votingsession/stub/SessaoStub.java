@@ -8,12 +8,9 @@ import com.marcohnp.votingsession.model.response.SessaoResponse;
 import com.marcohnp.votingsession.model.response.SessaoResultadoResponse;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class SessaoStub {
-
-    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     public static SessaoRequest createSessaoRequestStub() {
         return SessaoRequest.builder()

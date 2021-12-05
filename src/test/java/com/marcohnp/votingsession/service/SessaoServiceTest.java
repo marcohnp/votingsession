@@ -25,6 +25,9 @@ class SessaoServiceTest {
     private SessaoService sessaoService;
 
     @Mock
+    private PautaService pautaService;
+
+    @Mock
     private SessaoRepository repository;
 
     @Mock
